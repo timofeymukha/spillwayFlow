@@ -103,11 +103,10 @@ volScalarField deltaFreeSurface
         "deltaFreeSurface",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh,
-    dimensionedScalar("deltaFreeSurface", dimless, 0)
+    mesh
 );
 
 volScalarField Pd
@@ -260,27 +259,27 @@ else
 dimensionedScalar averageCellSize("averageCellSize", cellSize.average());
 
 // delta_fc thickness
-scalar thickness =  5e-3;
+//scalar thickness =  5e-3;
 
-deltaFreeSurface = pos(alpha1 - 0.5);
-deltaFreeSurface *= neg(fvc::average(fvc::interpolate(deltaFreeSurface)) -1);
+//deltaFreeSurface = pos(alpha1 - 0.5);
+//deltaFreeSurface *= neg(fvc::average(fvc::interpolate(deltaFreeSurface)) -1);
 
 
 // linear function for reducing delta_fc
-scalar factor = (1 - averageCellSize.value()/thickness);
-scalar i = 1;
+//scalar factor = (1 - averageCellSize.value()/thickness);
+//scalar i = 1;
 
-while (factor > 0)
-{
-    volScalarField temp(pos(fvc::average(fvc::interpolate(deltaFreeSurface))));
-    temp = (temp - deltaFreeSurface)*factor;
-    deltaFreeSurface += temp;
-    i++;
-    factor =  1 - i*averageCellSize.value()/thickness;
-}
+//while (factor > 0)
+//{
+    //volScalarField temp(pos(fvc::average(fvc::interpolate(deltaFreeSurface))));
+    //temp = (temp - deltaFreeSurface)*factor;
+    //deltaFreeSurface += temp;
+    //i++;
+    //factor =  1 - i*averageCellSize.value()/thickness;
+//}
 
 // Kill the expansion upwards
-deltaFreeSurface *= pos(alpha1 - 0.5);
+//deltaFreeSurface *= pos(alpha1 - 0.5);
 
 // Hard-coded entrainment point
 forAll(deltaFreeSurface, i)
