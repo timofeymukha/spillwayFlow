@@ -1,45 +1,7 @@
 /*              COMPUTE THE FREE SURFACE DETECTION FUNCTION                   */
 
-label n = 4;
-
-// Recompute the gradient of alpha1
+//Recompute the gradient of alpha1
 gradAlpha1 = fvc::grad(alpha1);
-
-// Compute the critical value of grad(alpha1)
-dimensionedScalar gradAlpha1Cr("gradAlpha1Cr", 1/(n*averageCellSize));
-
-Info<< "Critical grad(alpha1) value used in free surface detection = " 
-    << gradAlpha1Cr.value() << endl; 
-
-// Distance from the focus point of the parabola to its top point
-dimensionedScalar aParabola
-(
-    "aParabola",
-     0.25*sqr(gradAlpha1Cr - deltaFunctionCutoff)
-);
-    
-    // delta_fc thickness
-    scalar thickness =  5e-3;
-
-    deltaFreeSurface = pos(alpha1 - 0.5);
-    deltaFreeSurface *= neg(fvc::average(fvc::interpolate(deltaFreeSurface)) -1);
-
-
-    // linear function for reducing delta_fc
-    scalar factor = (1 - averageCellSize.value()/thickness);
-    scalar i = 1;
-
-    while (factor > 0)
-    {
-        volScalarField temp(pos(fvc::average(fvc::interpolate(deltaFreeSurface))));
-        temp = (temp - deltaFreeSurface)*factor;
-        deltaFreeSurface += temp;
-        i++;
-        factor =  1 - i*averageCellSize.value()/thickness;
-    }
-
-    // Kill the expansion upwards
-    deltaFreeSurface *= pos(alpha1 - 0.5);
 
 
 /*           COMPUTE THE SOURCE TERM IN THE ALPHAG EQUATION                   */
@@ -51,13 +13,6 @@ volVectorField nHat(gradAlpha1/(mag(gradAlpha1) + mixture.deltaN()));
 UnHat = U & nHat;
 dUdn = Foam::posPart(fvc::grad(UnHat) & nHat);
 
-forAll(dUdn,i)
-{
-    if(mesh.C()[i][0] < 0.5){
-        // Info << "cellCentres[i]" << mesh.C()[i] << endl;
-        deltaFreeSurface[i] = 0;
-    }
-}
 
 
 // Compute the surface roughness
@@ -130,8 +85,11 @@ fvScalarMatrix alphagEqn
   + bba*fvm::Sp(penaltySource, alphag)
 );
 
+Info << "Hi" << endl;
+
 // Only introduce air below h90
 alphagEqn.solve();
+Info << "Hi2" << endl;
 
 alphag.correctBoundaryConditions();
 
