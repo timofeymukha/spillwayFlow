@@ -37,6 +37,7 @@ dimensionedScalar interfaceThickness
 
 dimensionedScalar kCritical("kCritical", dimEnergy/dimMass, airModelProperties);
 
+
 dimensionedScalar diffusionFlag
 (
     "diffusionFlag",
@@ -73,6 +74,11 @@ dimensionedScalar distFrac
     airModelProperties
 );
 
+dimensionedScalar spillwayAngle("spillwayAngle", dimless, airModelProperties);
+scalar interfaceAngle = 90 - spillwayAngle.value();
+interfaceAngle = interfaceAngle/180*3.1415926535;
+
+const vector interfaceNormal(-Foam::cos(interfaceAngle), -Foam::sin(interfaceAngle), 0);
 
 Info<< "Air entrainment model parameters" << endl;
 Info<< "    phiEnt\t\t\t" << phiEnt.value() << endl;
@@ -80,6 +86,8 @@ Info<< "    Diffusion term active?\t" << diffusionFlag.value() << endl;
 Info<< "    Diffusion constant value:\t" << Ct.value() << endl;
 Info<< "    BBA active?\t\t\t" << bba.value() << endl;
 Info<< "    interfaceThickness\t\t" << interfaceThickness.value() << endl;
+
+
 if (kCritical.value() <= 0)
 {
     Info<< "    Critical k value not positive, will use the criterion based on"
@@ -89,6 +97,7 @@ else
 {
     Info<< "    kCritical\t\t\t" << kCritical.value() << endl;
 }
+Info<< "    Spillway angle\t\t" << spillwayAngle.value() << endl;
 
 // *** Sets the model that will be used to calculate the velocity of the dispersed air phase
 
@@ -108,3 +117,5 @@ if (momentumType == "slipModel")
 
 // *** Bubble radius -> r_b [m]
 dimensionedScalar r_b (airModelProperties.lookup("r_b"));
+
+

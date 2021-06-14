@@ -7,11 +7,20 @@ gradAlpha1 = fvc::grad(alpha1);
 /*           COMPUTE THE SOURCE TERM IN THE ALPHAG EQUATION                   */
 
 // Interface-normal unit vectors
-volVectorField nHat(gradAlpha1/(mag(gradAlpha1) + mixture.deltaN()));
+//volVectorField nHat(gradAlpha1/(mag(gradAlpha1) + mixture.deltaN()));
+
+//scalar interfaceAngle = 90 - spillwayAngle.value();
+//interfaceAngle = interfaceAngle/180*3.1415926535;
+
+//volVectorField nHat(vector(-Foam::cos(interfaceAngle), -Foam::sin(interfaceAngle), 0));
 
 // Interface-normal velocity derivative, keep positive values only
-UnHat = U & nHat;
-dUdn = Foam::posPart(fvc::grad(UnHat) & nHat);
+//
+//
+
+
+UnHat = U & interfaceNormal;
+dUdn = Foam::posPart(fvc::grad(UnHat) & interfaceNormal);
 
 
 
@@ -85,11 +94,9 @@ fvScalarMatrix alphagEqn
   + bba*fvm::Sp(penaltySource, alphag)
 );
 
-Info << "Hi" << endl;
 
 // Only introduce air below h90
 alphagEqn.solve();
-Info << "Hi2" << endl;
 
 alphag.correctBoundaryConditions();
 
